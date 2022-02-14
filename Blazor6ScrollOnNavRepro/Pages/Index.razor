@@ -1,0 +1,54 @@
+﻿@page "/"
+@inject IJSRuntime _js
+@inject NavigationManager _navigationManager
+
+<PageTitle>Index</PageTitle>
+<div>
+    <div class="sticky-top">
+        <button @onclick="ScrollWithQueryStringUpdate">Action With Scroll And Query String Update</button>
+        <button @onclick="ScrollOnly">Action With Just Scroll</button>
+    </div>
+
+    <h1>Hello, world!</h1>
+
+    Welcome to your new app.
+
+    <SurveyPrompt Title="How is Blazor working for you?" />
+
+    @foreach (var i in Enumerable.Range(0, 1000))
+    {
+        <p>@i</p>
+    }
+    
+    <div id="bottom-content">
+        End of Content
+    </div>
+
+</div>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Index Initialized.");
+        base.OnInitialized();
+    }
+
+    private async Task ScrollWithQueryStringUpdate()
+    {
+        await _js.InvokeVoidAsync("scrollElementIntoView", "bottom-content");
+
+        var newUri = new UriBuilder(_navigationManager.Uri)
+        {
+            Query = $"random={Random.Shared.Next()}"
+        };
+
+        _navigationManager.NavigateTo(newUri.ToString(), false); //seems like this should preserve scroll location
+    }
+
+    private async Task ScrollOnly()
+    {
+        await _js.InvokeVoidAsync("scrollElementIntoView", "bottom-content");
+    }
+
+}
